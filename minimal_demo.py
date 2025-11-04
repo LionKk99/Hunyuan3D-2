@@ -12,6 +12,11 @@
 # fine-tuning enabling code and other elements of the foregoing made publicly available
 # by Tencent in accordance with TENCENT HUNYUAN COMMUNITY LICENSE AGREEMENT.
 
+import os
+os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'
+os.environ['HF_HOME'] = '/data2/hja/CKPT/Hunyuan3D-2'  # 同时作为 HuggingFace 缓存目录
+os.environ['HF_HUB_DOWNLOAD_TIMEOUT'] = '300'  # 增加超时到5分钟
+
 from PIL import Image
 
 from hy3dgen.rembg import BackgroundRemover
@@ -22,12 +27,13 @@ model_path = 'tencent/Hunyuan3D-2'
 pipeline_shapegen = Hunyuan3DDiTFlowMatchingPipeline.from_pretrained(model_path)
 pipeline_texgen = Hunyuan3DPaintPipeline.from_pretrained(model_path)
 
-image_path = 'assets/demo.png'
+image_path = '/data2/hja/Tdagent/tools/Hunyuan3D-2/assets/example_images/052.png'
 image = Image.open(image_path).convert("RGBA")
 if image.mode == 'RGB':
     rembg = BackgroundRemover()
     image = rembg(image)
 
+# The output mesh is a trimesh object, which you could save to glb/obj (or other format) file.
 mesh = pipeline_shapegen(image=image)[0]
-mesh = pipeline_texgen(mesh, image=image)
-mesh.export('demo.glb')
+#mesh = pipeline_texgen(mesh, image=image)
+mesh.export('demo_2.glb')
